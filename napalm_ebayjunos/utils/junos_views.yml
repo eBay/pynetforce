@@ -1,0 +1,388 @@
+---
+
+####
+#### Interface table
+####
+
+junos_iface_table:
+  rpc: get-interface-information
+  args:
+    extensive: True
+  args_key: interface_name
+  item: physical-interface
+  view: junos_iface_view
+
+junos_iface_view:
+  fields:
+    is_up: { oper-status: True=up }
+    is_enabled: { admin-status: True=up }
+    description: { description: unicode }
+    last_flapped: { interface-flapped/@seconds: int }
+    #mode: logical-interface/address-family/address-family-name
+    speed: speed
+    mac_address: current-physical-address
+    subnet: unit/family/inet/address/name
+###
+### Mac address table
+###
+junos_mac_address_interface_table:
+  rpc: get-ethernet-switching-table-interface-information
+  item: l2ng-l2ald-mac-entry-vlan
+  key: l2ng-l2-vlan-id
+  view: junos_mac_address_interface_view
+
+junos_mac_address_interface_view:
+  groups:
+    entry: l2ng-mac-entry
+  fields_entry:
+    mac_address: l2ng-l2-mac-address
+    interface:  l2ng-l2-mac-logical-interface
+
+####
+#### BGP tables
+####
+
+junos_route_instance_table:
+  rpc: get-instance-information
+  item: instance-core
+  key: instance-name
+  view: junos_route_instance_view
+
+junos_route_instance_view:
+  fields:
+    name: instance-name
+
+junos_bgp_uptime_table:
+  rpc: get-bgp-summary-information
+  args:
+    instance: ''
+  item: bgp-peer
+  key: peer-address
+  view: junos_bgp_uptime_view
+
+junos_bgp_uptime_view:
+  fields:
+    uptime: { elapsed-time/@seconds: int }
+  tables: bgp-rib/name
+
+junos_bgp_table:
+  rpc: get-bgp-neighbor-information
+  item: bgp-peer
+
+  key: peer-address
+  view: junos_bgp_view
+
+junos_bgp_view:
+  fields:
+    remote_as: { peer-as: int }
+    description: description
+    is_up: { peer-state: True=Established }
+    is_enabled: { peer-state: False=True }
+    received_prefixes: { bgp-rib/received-prefix-count: int }
+    accepted_prefixes: { bgp-rib/accepted-prefix-count: int }
+    sent_prefixes: { bgp-rib/advertised-prefix-count: int }
+    tables: bgp-rib/name
+    local_as: { local-as: int }
+    peer_as: { peer-as: int }
+    local_id: local-id
+    remote_id: { peer-id: unicode }
+
+####
+#### LLDP table
+####
+
+junos_lldp_table:
+  rpc: get-lldp-neighbors-information
+  item: lldp-neighbor-information
+  key: lldp-local-port-id | lldp-local-interface
+  view: junos_lldp_view
+
+junos_lldp_view:
+  fields:
+    hostname: lldp-remote-system-name
+    port: lldp-remote-port-description | lldp-remote-port-id
+
+####
+#### Interface counters
+####
+
+junos_iface_counter_table:
+  rpc: get-interface-information
+  args:
+    extensive: True
+    interface_name: '[vmfgx][mle]*'
+  args_key: interface_name
+  item: physical-interface
+  view: junos_iface_counter_view
+
+
+junos_iface_counter_view:
+  groups:
+    ts: traffic-statistics
+    rxerrs: input-error-list
+    txerrs: output-error-list
+    ethernet_traffic_types: ethernet-mac-statistics
+
+
+  # fields that are part of groups are called
+  # "fields_<group-name>"
+  fields_ethernet_traffic_types:
+    rx_broadcast_packets: { input-broadcasts: int }
+    tx_broadcast_packets: { output-broadcasts: int }
+    rx_unicast_packets: { input-unicasts: int }
+    tx_unicast_packets: { output-unicasts: int }
+    rx_multicast_packets: { input-multicasts: int }
+    tx_multicast_packets: { output-multicasts: int }
+
+  fields_ts:
+    rx_octets: { input-bytes: int }
+    tx_octets: { output-bytes: int }
+
+  fields_rxerrs:
+    rx_errors: { input-errors: int }
+    rx_discards: { input-discards: int }
+
+  fields_txerrs:
+    tx_errors: { output-errors: int }
+    tx_discards: { output-drops: int }
+
+junos_enviroment_table:
+  rpc: get-environment-information
+  args:
+  item: environment-item
+  key: name
+  view: junos_enviroment_view
+
+junos_enviroment_view:
+  fields:
+    class: class
+    status: status
+    temperature: { temperature/@celsius: int }
+
+junos_routing_engine_table:
+  rpc: get-route-engine-information
+  args:
+  item: route-engine
+  key: slot
+  view: junos_routing_engine_view
+
+junos_routing_engine_view:
+  fields:
+    cpu-idle: { cpu-idle: int }
+    memory-dram-size: { memory-dram-size: int }
+    memory-buffer-utilization : { memory-buffer-utilization: int }
+
+junos_temperature_thresholds:
+  rpc: get-temperature-threshold-information
+  args:
+  item: temperature-threshold
+  key: name
+  view: junos_temperature_thresholds_view
+
+junos_temperature_thresholds_view:
+  fields:
+    name: name
+    yellow-alarm: { yellow-alarm: int }
+    red-alarm: { red-alarm: int }
+    tx_discards: { output-drops: int }
+
+###
+### LLDP Interface Neighbors (detailed LLDP info)
+###
+
+junos_lldp_interface_neighbors_table:
+  rpc: get-lldp-interface-neighbors
+  item: lldp-neighbor-information
+  args:
+      interface_device: 'et-0/0/20'
+  key: lldp-local-interface
+  view: junos_lldp_interface_neighbors_view
+
+junos_lldp_interface_neighbors_view:
+  fields:
+    interface: {lldp-local-interface: unicode}
+    interface_id: {lldp-local-port-id: unicode}
+    parent_interface: {lldp-local-parent-interface-name: unicode}
+    remote_port_id: {lldp-remote-port-id: unicode}
+    remote_chassis_id: {lldp-remote-chassis-id: unicode}
+    remote_port_description: {lldp-remote-port-description: unicode}
+    remote_system_name: {lldp-remote-system-name: unicode}
+    remote_system_description: {lldp-system-description/lldp-remote-system-description: unicode}
+    remote_system_capab: {lldp-remote-system-capabilities-supported: unicode}
+    remote_system_enable_capab: {lldp-remote-system-capabilities-enabled: unicode}
+
+###
+### LLDP Local Info
+###
+
+junos_lldp_local_info_table:
+  rpc: get-lldp-local-info
+  item: lldp-local-interface-info
+  key: lldp-local-interface-name
+  view: junos_lldp_local_info_view
+
+junos_lldp_local_info_view:
+  fields:
+    interface: {lldp-local-interface-name: unicode}
+    parent_interface: {lldp-parent-local-interface-name: unicode}
+    interface_id: {lldp-local-interface-id: unicode}
+    interface_description: {lldp-local-interface-description: unicode}
+    interface_status: {lldp-local-interface-status: unicode}
+
+###
+### BGP config
+###
+
+junos_bgp_config_table:
+  get: protocols/bgp/group
+  view: junos_bgp_config_view
+
+junos_bgp_config_group_table:
+  get: protocols/bgp/group
+  view: junos_bgp_config_view
+  required_keys:
+    group: name
+
+junos_bgp_config_view:
+  fields:
+    type: type
+    description: description
+    apply_groups: apply-groups
+    local_address: local-address
+    multihop_ttl: multihop/ttl
+    local_as: local-as/as-number
+    peer_as: peer-as
+    multipath: multipath
+    remove_private: remove-private
+    import_policy: import
+    export_policy: export
+    inet_unicast_limit_prefix_limit: family/inet/unicast/prefix-limit/maximum
+    inet_unicast_teardown_threshold_prefix_limit: family/inet/unicast/prefix-limit/teardown/limit-threshold
+    inet_unicast_teardown_timeout_prefix_limit: family/inet/unicast/prefix-limit/teardown/idle-timeout/timeout
+    inet_unicast_novalidate_prefix_limit: family/inet/unicast/prefix-limit/no-validate
+    inet_flow_limit_prefix_limit: family/inet/flow/prefix-limit/maximum
+    inet_flow_teardown_threshold_prefix_limit: family/inet/flow/prefix-limit/teardown/limit-threshold
+    inet_flow_teardown_timeout_prefix_limit: family/inet/flow/prefix-limit/teardown/idle-timeout/timeout
+    inet_flow_novalidate_prefix_limit: family/inet/flow/prefix-limit/no-validate
+    inet6_unicast_limit_prefix_limit: family/inet6/unicast/prefix-limit/maximum
+    inet6_unicast_teardown_threshold_prefix_limit: family/inet6/unicast/prefix-limit/teardown/limit-threshold
+    inet6_unicast_teardown_timeout_prefix_limit: family/inet6/unicast/prefix-limit/teardown/idle-timeout/timeout
+    inet6_unicast_novalidate_prefix_limit: family/inet6/unicast/prefix-limit/no-validate
+    inet6_flow_limit_prefix_limit: family/inet6/flow/prefix-limit/maximum
+    inet6_flow_teardown_threshold_prefix_limit: family/inet6/flow/prefix-limit/teardown/limit-threshold
+    inet6_flow_teardown_timeout_prefix_limit: family/inet6/flow/prefix-limit/teardown/idle-timeout/timeout
+    inet6_flow_novalidate_prefix_limit: family/inet6/flow/prefix-limit/no-validate
+
+junos_bgp_config_peers_table:
+  get: protocols/bgp/group/neighbor
+  view: junos_bgp_config_peers_view
+
+junos_bgp_config_peers_view:
+  fields:
+    group: ../name
+    description: description
+    import_policy: import
+    export_policy: export
+    local_address: neighbor/local-address
+    local_as: local-as
+    peer_as: peer-as
+    authentication_key: authentication_key
+    inet_unicast_limit_prefix_limit: family/inet/unicast/prefix-limit/maximum
+    inet_unicast_teardown_threshold_prefix_limit: family/inet/unicast/prefix-limit/teardown/limit-threshold
+    inet_unicast_teardown_timeout_prefix_limit: family/inet/unicast/prefix-limit/teardown/idle-timeout/timeout
+    inet_unicast_novalidate_prefix_limit: family/inet/unicast/prefix-limit/no-validate
+    inet_flow_limit_prefix_limit: family/inet/flow/prefix-limit/maximum
+    inet_flow_teardown_threshold_prefix_limit: family/inet/flow/prefix-limit/teardown/limit-threshold
+    inet_flow_teardown_timeout_prefix_limit: family/inet/flow/prefix-limit/teardown/idle-timeout/timeout
+    inet_flow_novalidate_prefix_limit: family/inet/flow/prefix-limit/no-validate
+    inet6_unicast_limit_prefix_limit: family/inet6/unicast/prefix-limit/maximum
+    inet6_unicast_teardown_threshold_prefix_limit: family/inet6/unicast/prefix-limit/teardown/limit-threshold
+    inet6_unicast_teardown_timeout_prefix_limit: family/inet6/unicast/prefix-limit/teardown/idle-timeout/timeout
+    inet6_unicast_novalidate_prefix_limit: family/inet6/unicast/prefix-limit/no-validate
+    inet6_flow_limit_prefix_limit: family/inet6/flow/prefix-limit/maximum
+    inet6_flow_teardown_threshold_prefix_limit: family/inet6/flow/prefix-limit/teardown/limit-threshold
+    inet6_flow_teardown_timeout_prefix_limit: family/inet6/flow/prefix-limit/teardown/idle-timeout/timeout
+    inet6_flow_novalidate_prefix_limit: family/inet6/flow/prefix-limit/no-validate
+
+####
+#### Custom VRF info from Juniper interfaces.
+####
+
+junos_vrf_iface_table:
+    rpc: get-interface-information
+    args:
+        interface_name: '*'
+        routing_instance: all
+        terse: True
+    # args_key: interface_name
+    args_key: routing_instance
+    item: physical-interface/logical-interface/.//address-family
+    key:
+        - ../name
+        - address-family-name
+    view: junos_vrf_iface_view
+
+junos_vrf_iface_view:
+    fields:
+        description: ../description
+        family_name: address-family-name
+        address: interface-address/ifa-local
+
+####
+### Get vlan info from Juniper
+###
+
+junos_vlan_table:
+  rpc: get-vlan-information
+  key: l2ng-l2rtb-vlan-name
+  item: l2ng-l2ald-vlan-instance-group
+  view: junos_vlan_view
+
+junos_vlan_view:
+  fields:
+    name: l2ng-l2rtb-vlan-name
+    tag: l2ng-l2rtb-vlan-tag
+    members: .//l2ng-l2rtb-vlan-member-interface
+    status: l2ng-l2rtb-vlan-status
+
+###
+###Get all interfaces configuration
+###
+junos_config_iface_table:
+  get: interfaces/interface
+  view: junos_config_iface_view
+
+junos_config_iface_view:
+  fields:
+    name: { name: unicode }
+    description: { description: unicode }
+    native-vlan-id: { native-vlan-id: unicode }
+    interface-mode: { unit/family/ethernet-switching/interface-mode: unicode }
+    members: { unit/family/ethernet-switching/vlan//members: unicode }
+
+###
+### Get specific irb interfaces configuration
+###
+junos_config_irbiface_table:
+  get: interfaces/interface/unit
+  view: junos_config_irbiface_view
+  required_keys:
+    unit: name
+    interface: name
+
+
+junos_config_irbiface_view:
+  fields:
+    subnets: {family/inet/address/name: unicode}
+    name: {name: unicode}
+
+#### show instance summary
+junos_vrf_table:
+  rpc: get-instance-information
+  item: instance-core
+  key: instance-name
+  view: VrfView
+
+VrfView:
+  fields:
+    instance-name: instance-name
