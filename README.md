@@ -66,7 +66,12 @@ $ tox
 
 ## Useful links:
 
-https://www.openstack.org/videos/boston-2017/netforce-extending-neutron-to-support-routed-networks-at-scale-in-ebay
+- [Netforce_slideshare]: Presentations for the quick overview of what Netforce can do.
+
+- [Netforce_walkthrough]: Detailed walkthrough of the presentation above.
+
+[Netforce_slideshare]: https://www.slideshare.net/aliasgarginwala/netforce-76964211
+[Netforce_walkthrough]: https://www.youtube.com/watch?v=KX0LvsIXsU4 
 
 ## License
 
