@@ -2,22 +2,28 @@ alembic
 MySQL-python
 tooz==1.59
 suds
-napalm==1.1.0
-napalm-base==0.21.0
-napalm-eos==0.5.1
-napalm-fortios==0.3.1
-napalm-ibm==0.1.6
-napalm-ios==0.5.1
-napalm-iosxr==0.4.5
-napalm-junos==0.6.0
-napalm-nxos==0.5.0
-napalm-panos==0.3.0
-napalm-pluribus==0.5.0
+#napalm==1.1.0
+#napalm-base==0.21.0
+#napalm-eos==0.5.1
+#napalm-fortios==0.3.1
+#napalm-ibm==0.1.6
+#napalm-ios==0.5.1
+#napalm-iosxr==0.4.5
+#napalm-junos==0.6.0
+#napalm-nxos==0.5.0
+#napalm-panos==0.3.0
+#napalm-pluribus==0.5.0
 oslo.config==3.14.0
 greenlet==0.4.9
 ipaddr
 paramiko
 
+-e git+https://github.com/noah8713/pip10-nap-1.1.0.git@master#egg=napalm
+-e git+https://github.com/noah8713/pip10-nap-base-0.21.0.git@master#egg=napalm_base
+-e git+https://github.com/noah8713/pip10-nap-eos-0.5.1.git@master#egg=napalm_eos
+-e git+https://github.com/noah8713/pip10-nap-junos-0.6.0.git@master#egg=napalm_junos
+-e git+https://github.com/noah8713/pip10-nap-nxos-0.5.0.git@master#egg=napalm_nxos
 -e git+https://github.com/noah8713/neutron.git@stable/juno#egg=neutron
 -e git+https://github.com/noah8713/ncclient.git@master#egg=ncclient
 pbr==1.10.0
+xmltodict
