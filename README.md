@@ -10,14 +10,25 @@ configuring network devices.
 
 ----
 
+# Use cases
+
+* Can be pluged in to Neutron to provide on-demand subnet cap-adds 
+  for [OpenStack] VMs and [Kubernetes] Pods running on top of OpenStack.
+* Can also be used by [OpenStack Ironic] for provisioning on-demand BMs in
+  [VRF] network to place a BM in respective VRF(vlan) to access mode from
+  trunk via Neutron update-port operation for different VPCs using
+  [routed networks].
+* Can be operated individually by a network engineer to configure devices in
+  different data centers as a global api service.
+
 
 ## To start as a developer:
 
 ```
 $ git clone https://github.com/eBay/pynetforce.git
-$ cd netforce
 $ virtualenv ~/Downloads/netforce-dev
 $ source ~/Downloads/netforce-dev/bin/activate
+$ cd netforce
 $ tox
 ```
 
@@ -49,10 +60,13 @@ $ tox
 - [OpenConfig Integration]: Integrate with OpenConfig to program openconfig
    enabled devices using yang models as Netforce gives a unified api layer.
 
-[Kubernetes]: https://kubernetes.io/
+[Kubernetes]: https://kubernetes.io
+[OpenStack]: https://www.openstack.org
 [OpenStack Neutron's]: https://wiki.openstack.org/wiki/Neutron
 [OpenStack Keystone]: https://wiki.openstack.org/wiki/Keystone
 [routed networks]: https://specs.openstack.org/openstack/neutron-specs/specs/newton/routed-networks.html
+[VRF]: https://en.wikipedia.org/wiki/Virtual_routing_and_forwarding
+[OpenStack Ironic]: https://wiki.openstack.org/wiki/Ironic
 [NAPALM integration]: https://github.com/napalm-automation
 [OpenConfig Integration]: http://www.openconfig.net/
 [Apache License]: http://www.apache.org/licenses/LICENSE-2.0.txt
